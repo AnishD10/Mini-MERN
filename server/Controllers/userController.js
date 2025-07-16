@@ -2,6 +2,7 @@ require("dotenv").config();
 const user = require("../Model/User"); //User Model is imported for registration
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { generateOtp, findUserByOtp, clearOtpFields , transporter } = require("../utils/otputils")
 
 const RegisterUser = async (req, res) => {
   const { name, email, password, role } = req.body;
@@ -72,4 +73,45 @@ const LoginUser = async (req, res) => {
   }
 };
 
-module.exports = { RegisterUser, LoginUser };
+const forgotPassword = async (req ,res) => {
+  try {
+    const { email } = req.body;
+    const forgotUser = await user.findOne({ email });
+    if (!forgotUser) return res.status(404).send({ message: "Email not found" });
+
+    forgotUser.otp = generateOtp();
+    forgotUser.otpExpires = Date.now() + 10 * 60 * 1000;
+    await forgotUser.save();
+
+    await transporter.sendMail({
+      to: email,
+      subject: "Your OTP",
+      text: `Your OTP is ${forgotUser.otp}. It expires in 10 minutes.`,
+    });
+
+    res.status(200).send({ message: "OTP sent" , OTP : forgotUser.otp});
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+const resetPassword = async (req , res) => {
+  try {
+    const { otp, newPassword } = req.body;
+    if (!otp || !newPassword) {
+      return res.status(400).send({ message: "OTP and new password are required" });
+    }
+
+    const resetUser = await findUserByOtp(otp);
+    if (!resetUser) return res.status(400).send({ message: "Invalid or expired OTP" });
+
+    resetUser.password = await bcrypt.hash(newPassword, 10);
+    await clearOtpFields(resetUser);
+
+    res.status(200).send({ message: "Password reset successful" });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+module.exports = { RegisterUser, LoginUser , forgotPassword , resetPassword };

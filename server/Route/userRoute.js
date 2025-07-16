@@ -11,5 +11,7 @@ router.post('/login/employee' ,userController.LoginUser)
 
 router.post('/login/admin' , userController.LoginUser)
 
+router.post('/forgotPassword' , userController.forgotPassword)
+router.put('/resetPassword', userController.resetPassword)
 
 module.exports = router

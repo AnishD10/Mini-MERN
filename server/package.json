@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev":"nodemon server.js",
+    "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,10 +15,14 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^17.1.0",
     "express": "^5.1.0",
+    "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
     "math": "^0.0.3",
-    "mongoose": "^8.16.1"
+    "mongoose": "^8.16.1",
+    "nodemailer": "^7.0.5",
+    "npm": "^11.4.2"
   }
 }
